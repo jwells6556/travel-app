@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
                             URL url = new URL("http://api.sandbox.amadeus.com/");
                             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                            urlConnection.setReadTimeout(30000);
-                            urlConnection.setConnectTimeout(30000);
+                            urlConnection.setReadTimeout(300000);
+                            urlConnection.setConnectTimeout(300000);
 
                             Airport closestAirport = getClosestAirport(lat_lon[0], lat_lon[1]);
                             Flight cheapestFlight = getCheapestFlight(closestAirport);
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Response response2 = mClient.newCall(request2).execute();
+
 
         String nearestAirPortResponse = response2.body().string();
 
@@ -217,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         String responseText = response.body().string();
 
 
-        if (!response.isSuccessful()) {
+        if (response.isSuccessful()) {
             Log.d(TAG, "getRandomFlight: " + responseText);
         }
 
