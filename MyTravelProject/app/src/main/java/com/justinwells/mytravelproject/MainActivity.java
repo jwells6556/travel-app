@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Date;
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         //Log.d(TAG, "onCreate: "+CurrentDate.isValidDate("2018-13-06"));
         mClient = new OkHttpClient();
 
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
                             urlConnection.setReadTimeout(300000);
                             urlConnection.setConnectTimeout(300000);
 
+
+                            getHotelByAirport(null);
                             Airport closestAirport = getClosestAirport(lat_lon[0], lat_lon[1]);
                             Flight cheapestFlight = getCheapestFlight(closestAirport);
                             Flight randomFlight = getRandomFlight();
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public Airport getClosestAirport (String latitude, String longitude) throws IOException, JSONException {
+    public Airport getClosestAirport (String latitude, String longitude) throws IOException, JSONException, SocketTimeoutException {
         Request request2 = new Request.Builder()
                 .url("http://api.sandbox.amadeus.com/v1.2/airports/nearest-relevant?latitude="
                         + latitude
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         return new Airport(airportCode,airportCity,airportName);
     }
 
-    public String [] getLatLon (String location) throws JSONException, IOException {
+    public String [] getLatLon (String location) throws JSONException, IOException, SocketTimeoutException {
         Request request = new Request.Builder()
                 .url("https://maps.googleapis.com/maps/api/geocode/json?key="
                         + GOOGLE_API_KEY
@@ -138,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         return lat_lon;
     }
 
-    public Flight getCheapestFlight (Airport destination) throws IOException, JSONException {
+    public Flight getCheapestFlight (Airport destination) throws IOException, JSONException, SocketTimeoutException {
         Request request = new Request.Builder()
                 .url("http://api.sandbox.amadeus.com/v1.2/flights/low-fare-search?"
                         +"origin=" +"JFK"
@@ -188,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         +"radius=50"
                         +"&check_in=2015-09-01"
                         +"&check_out=2015-09-03"
-                        +"&number_of_results=50"
+                        +"&number_of_results=2"
                         +"&apikey=" +TRAVEL_API_KEY)
                 .build();
 
@@ -198,14 +202,32 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "getCheapestHotel: " + getCheapestHotelResponse);
     }
 
+    public void getHotelByAirport (Airport airport) throws IOException, SocketTimeoutException, JSONException {
+        Request request = new Request.Builder()
+                .url("https://api.sandbox.amadeus.com/v1.2/hotels/search-airport?"
+                        +"apikey=" + TRAVEL_API_KEY
+                        +"&location=" + "LAX"
+                        +"&check_in=2017-03-14"
+                        +"&check_out=2017-03-16"
+                        +"&number_of_results=2")
+                .build();
+        Response response = mClient.newCall(request).execute();
+        String responseText = response.body().string();
+        Log.d(TAG, "getHotelByAirport: " + responseText);
 
+        JSONObject json = new JSONObject(responseText);
+
+
+
+
+    }
 
     public String convertToDecimalDegrees (String latOrLon) {
 
         return null;
     }
 
-    public Flight getRandomFlight () throws IOException {
+    public Flight getRandomFlight () throws IOException, SocketTimeoutException {
         String baseUrl = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?";
         final Request request = new Request.Builder()
                 .url(baseUrl
