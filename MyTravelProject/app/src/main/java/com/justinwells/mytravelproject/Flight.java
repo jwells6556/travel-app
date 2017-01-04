@@ -1,11 +1,13 @@
 package com.justinwells.mytravelproject;
 
+import java.io.Serializable;
+
 /**
  * Created by justinwells on 12/22/16.
  */
 
-public class Flight {
-    private String price, departOrigin, arriveDestination, departDestination, arriveOrigin;
+public class Flight implements Serializable{
+    private String price, departOrigin, arriveDestination, departDestination, arriveOrigin, destination;
 
     public Flight(String price, String departOrigin, String arriveDestination, String departDestination, String arriveOrigin) {
         this.price = price;
@@ -19,9 +21,7 @@ public class Flight {
         return price;
     }
 
-    public String getDepartOrigin() {
-        return departOrigin;
-    }
+    public String getDepartOrigin() { return departOrigin; }
 
     public String getArriveDestination() {
         return arriveDestination;
@@ -34,4 +34,6 @@ public class Flight {
     public String getArriveOrigin() {
         return arriveOrigin;
     }
+
+    public String getDestination() { return destination; }
 }
