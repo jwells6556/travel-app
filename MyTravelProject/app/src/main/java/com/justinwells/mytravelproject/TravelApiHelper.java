@@ -1,5 +1,6 @@
 package com.justinwells.mytravelproject;
 
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -9,6 +10,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -140,7 +144,7 @@ public class TravelApiHelper {
     }
 
 
-    public Flight getRandomFlight () throws IOException {
+    public List<Flight> getRandomFlight () throws IOException, JSONException {
         String baseUrl = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?";
         final Request request = new Request.Builder()
                 .url(baseUrl
@@ -156,6 +160,27 @@ public class TravelApiHelper {
 
         if (response.isSuccessful()) {
             Log.d(TAG, "getRandomFlight: success" + responseText);
+
+            JSONObject jsonObject = new JSONObject(responseText);
+            JSONArray resultsArray = jsonObject.getJSONArray("results");
+
+            List<Flight>flightList = new ArrayList<>();
+            int length = resultsArray.length();
+
+            if (length > 10) {
+                length = 10;
+            }
+
+            for (int i = 0; i < length; i++) {
+                JSONObject flightObject = resultsArray.getJSONObject(i);
+                Flight flight = new Flight(flightObject.getString("price"),
+                                            flightObject.getString("departure_date"),
+                                            flightObject.getString("return_date"),
+                                            flightObject.getString("destination"));
+                flightList.add(flight);
+            }
+
+            return flightList;
         }
 
         return null;

@@ -1,5 +1,6 @@
 package com.justinwells.mytravelproject.Activities;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -50,18 +51,8 @@ public class MainActivity extends AppCompatActivity {
         otherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               AsyncTask<Void,Void,Void> mTask = new AsyncTask<Void, Void, Void>() {
-                   @Override
-                   protected Void doInBackground(Void... voids) {
-                       TravelApiHelper mHelper = new TravelApiHelper();
-                       try {
-                           Flight flight = mHelper.getRandomFlight();
-                       } catch (IOException e) {
-                           e.printStackTrace();
-                       }
-                       return null;
-                   }
-               }.execute();
+                Intent getRandomResults = new Intent(MainActivity.this, ResultsActivity.class);
+                startActivity(getRandomResults);
             }
         });
 

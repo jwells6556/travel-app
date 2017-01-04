@@ -17,6 +17,14 @@ public class Flight implements Serializable{
         this.arriveOrigin = arriveOrigin;
     }
 
+    public Flight(String price, String departDate, String returnDate, String destination) {
+        this.price = price;
+        departOrigin = departDate;
+        arriveOrigin = returnDate;
+        this.destination = destination;
+
+    }
+
     public String getPrice() {
         return price;
     }
