@@ -33,7 +33,7 @@ public class ResultRecyclerViewAdapter extends RecyclerView.Adapter<ResultViewHo
     }
 
     @Override
-    public void onBindViewHolder(ResultViewHolder holder, int position) {
+    public void onBindViewHolder(ResultViewHolder holder, final int position) {
         final Flight thisFlight = flightList.get(position);
 
         holder.mResultDestination.setText(thisFlight.getDestination());
@@ -45,7 +45,7 @@ public class ResultRecyclerViewAdapter extends RecyclerView.Adapter<ResultViewHo
             @Override
             public void onClick(View view) {
                 Intent goToDetail = new Intent(view.getContext(), DetailActivity.class);
-                goToDetail.putExtra("flight", thisFlight);
+                goToDetail.putExtra("pos", position);
                 view.getContext().startActivity(goToDetail);
             }
         });

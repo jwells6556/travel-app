@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.justinwells.mytravelproject.Flight;
+import com.justinwells.mytravelproject.FlightResultsSingleton;
 import com.justinwells.mytravelproject.R;
 import com.justinwells.mytravelproject.RecyclerViewAdapters.ResultRecyclerViewAdapter;
 import com.justinwells.mytravelproject.TravelApiHelper;
@@ -17,16 +18,20 @@ import com.justinwells.mytravelproject.TravelApiHelper;
 import java.io.IOException;
 import java.util.List;
 
+import static java.security.AccessController.getContext;
+
 public class ResultsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ResultRecyclerViewAdapter mAdapter;
     private List<Flight> mFlightList;
+    FlightResultsSingleton flightResultsSingleton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
 
+        flightResultsSingleton = FlightResultsSingleton.getInstance();
         populateList();
 
     }
@@ -49,10 +54,12 @@ public class ResultsActivity extends AppCompatActivity {
             protected void onPostExecute(List<Flight> flights) {
                 mFlightList = flights;
 
+                flightResultsSingleton.newList(mFlightList);
+
                 if (!(mFlightList==null)) {
                     setUpRecyclerView(mFlightList);
                 } else {
-                    Toast.makeText(mRecyclerView.getContext(), "No results found, try expanding search criteria", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "No results found, try expanding search criteria", Toast.LENGTH_SHORT).show();
                 }
             }
         }.execute();

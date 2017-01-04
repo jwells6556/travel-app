@@ -148,7 +148,7 @@ public class TravelApiHelper {
         String baseUrl = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?";
         final Request request = new Request.Builder()
                 .url(baseUrl
-                        +"origin=" + "LAX"
+                        +"origin=" + "JFK"
                         +"&max_price=500"
                         +"&apikey=" + TRAVEL_API_KEY)
                 .build();
@@ -176,7 +176,7 @@ public class TravelApiHelper {
                 Flight flight = new Flight(flightObject.getString("price"),
                                             flightObject.getString("departure_date"),
                                             flightObject.getString("return_date"),
-                                            flightObject.getString("destination"));
+                                            getDestinationNameFromAirportCode(flightObject.getString("destination")));
                 flightList.add(flight);
             }
 
@@ -184,5 +184,20 @@ public class TravelApiHelper {
         }
 
         return null;
+    }
+
+    public String getDestinationNameFromAirportCode (String code) throws IOException, JSONException {
+        String url = "http://api.sandbox.amadeus.com/v1.2/location/" + code
+                + "?apikey=" + TRAVEL_API_KEY;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        String responseText = mClient.newCall(request).execute().body().string();
+
+        JSONObject jsonObject = new JSONObject(responseText);
+        JSONObject cityInfo = jsonObject.getJSONObject("city");
+
+
+        return cityInfo.getString("name");
     }
 }

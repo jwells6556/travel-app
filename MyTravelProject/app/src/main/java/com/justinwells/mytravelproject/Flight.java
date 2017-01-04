@@ -10,7 +10,7 @@ public class Flight implements Serializable{
     private String price, departOrigin, arriveDestination, departDestination, arriveOrigin, destination;
 
     public Flight(String price, String departOrigin, String arriveDestination, String departDestination, String arriveOrigin) {
-        this.price = price;
+        this.price = "$" + price;
         this.departOrigin = departOrigin;
         this.arriveDestination = arriveDestination;
         this.departDestination = departDestination;
@@ -18,7 +18,7 @@ public class Flight implements Serializable{
     }
 
     public Flight(String price, String departDate, String returnDate, String destination) {
-        this.price = price;
+        this.price = "$" + price;
         departOrigin = departDate;
         arriveOrigin = returnDate;
         this.destination = destination;
