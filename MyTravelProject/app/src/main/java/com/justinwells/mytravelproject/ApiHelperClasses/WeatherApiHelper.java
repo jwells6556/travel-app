@@ -1,6 +1,7 @@
-package com.justinwells.mytravelproject;
+package com.justinwells.mytravelproject.ApiHelperClasses;
 
-import org.json.JSONArray;
+import com.justinwells.mytravelproject.CustomObjects.Weather;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

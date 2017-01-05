@@ -1,14 +1,13 @@
 package com.justinwells.mytravelproject.RecyclerViewAdapters;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.justinwells.mytravelproject.Activities.DetailActivity;
-import com.justinwells.mytravelproject.Flight;
+import com.justinwells.mytravelproject.CustomObjects.Flight;
 import com.justinwells.mytravelproject.R;
 
 import java.util.ArrayList;

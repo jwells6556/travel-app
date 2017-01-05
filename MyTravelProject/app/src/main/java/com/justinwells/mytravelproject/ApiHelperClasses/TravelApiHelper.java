@@ -1,6 +1,11 @@
-package com.justinwells.mytravelproject;
+package com.justinwells.mytravelproject.ApiHelperClasses;
 
 import android.util.Log;
+
+import com.justinwells.mytravelproject.CustomObjects.Airport;
+import com.justinwells.mytravelproject.CustomObjects.Flight;
+import com.justinwells.mytravelproject.CustomObjects.Hotel;
+import com.justinwells.mytravelproject.Singletons.UserSettings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -241,7 +246,7 @@ public class TravelApiHelper {
                                 .getJSONObject(0);
 
         String hotelName = result.getString("property_name");
-        String hotelPrice = result.getString("total_price");
+        String hotelPrice = result.getJSONObject("total_price").getString("amount");
 
         return new Hotel(hotelName, hotelPrice);
 

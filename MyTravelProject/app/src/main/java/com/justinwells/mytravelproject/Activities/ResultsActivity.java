@@ -5,23 +5,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.justinwells.mytravelproject.Flight;
-import com.justinwells.mytravelproject.FlightResultsSingleton;
+import com.justinwells.mytravelproject.CustomObjects.Flight;
+import com.justinwells.mytravelproject.Singletons.FlightResultsSingleton;
 import com.justinwells.mytravelproject.R;
 import com.justinwells.mytravelproject.RecyclerViewAdapters.ResultRecyclerViewAdapter;
-import com.justinwells.mytravelproject.TravelApiHelper;
-import com.justinwells.mytravelproject.UserSettings;
+import com.justinwells.mytravelproject.ApiHelperClasses.TravelApiHelper;
+import com.justinwells.mytravelproject.Singletons.UserSettings;
 
-import java.io.IOException;
 import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class ResultsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;

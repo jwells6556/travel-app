@@ -1,4 +1,4 @@
-package com.justinwells.mytravelproject;
+package com.justinwells.mytravelproject.CustomObjects;
 
 /**
  * Created by justinwells on 12/22/16.

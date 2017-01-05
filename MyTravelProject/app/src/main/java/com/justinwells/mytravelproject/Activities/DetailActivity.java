@@ -5,13 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.justinwells.mytravelproject.Flight;
-import com.justinwells.mytravelproject.FlightResultsSingleton;
-import com.justinwells.mytravelproject.Hotel;
+import com.justinwells.mytravelproject.CustomObjects.Flight;
+import com.justinwells.mytravelproject.Singletons.FlightResultsSingleton;
+import com.justinwells.mytravelproject.CustomObjects.Hotel;
 import com.justinwells.mytravelproject.R;
-import com.justinwells.mytravelproject.TravelApiHelper;
-import com.justinwells.mytravelproject.Weather;
-import com.justinwells.mytravelproject.WeatherApiHelper;
+import com.justinwells.mytravelproject.ApiHelperClasses.TravelApiHelper;
+import com.justinwells.mytravelproject.CustomObjects.Weather;
+import com.justinwells.mytravelproject.ApiHelperClasses.WeatherApiHelper;
 
 import org.json.JSONException;
 
@@ -22,7 +22,7 @@ public class DetailActivity extends AppCompatActivity {
     String location;
     FlightResultsSingleton flightResultsSingleton;
     Flight flight;
-    int totalPrice, airfare, hotelfare;
+    int totalPrice, airFare, hotelFare;
     TravelApiHelper travelHelper;
 
     @Override
@@ -46,6 +46,7 @@ public class DetailActivity extends AppCompatActivity {
         setWeather();
         setHotelInfo();
         setFlightInfo();
+        setTotalPrice();
     }
 
     public void setHotelInfo () {
@@ -68,12 +69,14 @@ public class DetailActivity extends AppCompatActivity {
                 super.onPostExecute(hotel);
                 hotelName.setText(hotel.getHotelName());
                 hotelPrice.setText(hotel.getPrice());
+                hotelFare = Integer.valueOf(hotel.getPrice());
             }
         }.execute(flight);
     }
 
     public void setFlightInfo () {
         flightPrice.setText(flight.getPrice());
+        airFare = Integer.valueOf(flight.getPrice());
     }
 
     public void setWeather () {
@@ -109,5 +112,9 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         return flightResultsSingleton.getDirectSearchFlight();
+    }
+
+    public void setTotalPrice () {
+        totalPrice = airFare + hotelFare;
     }
 }

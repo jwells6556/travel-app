@@ -1,4 +1,6 @@
-package com.justinwells.mytravelproject;
+package com.justinwells.mytravelproject.Singletons;
+
+import com.justinwells.mytravelproject.CustomObjects.Flight;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.justinwells.mytravelproject;
+package com.justinwells.mytravelproject.CustomObjects;
 
 import java.io.Serializable;
 

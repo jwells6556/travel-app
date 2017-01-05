@@ -2,9 +2,7 @@ package com.justinwells.mytravelproject.Activities;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -27,20 +25,17 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.justinwells.mytravelproject.Airport;
+import com.justinwells.mytravelproject.CustomObjects.Airport;
 import com.justinwells.mytravelproject.CurrentDate;
-import com.justinwells.mytravelproject.Flight;
-import com.justinwells.mytravelproject.FlightResultsSingleton;
+import com.justinwells.mytravelproject.CustomObjects.Flight;
+import com.justinwells.mytravelproject.Singletons.FlightResultsSingleton;
 import com.justinwells.mytravelproject.R;
-import com.justinwells.mytravelproject.TravelApiHelper;
-import com.justinwells.mytravelproject.UserSettings;
+import com.justinwells.mytravelproject.ApiHelperClasses.TravelApiHelper;
+import com.justinwells.mytravelproject.Singletons.UserSettings;
 
 import org.json.JSONException;
 
 import java.io.IOException;
-
-import static com.justinwells.mytravelproject.AppConstants.PREFERRED_AIRPORT;
-import static com.justinwells.mytravelproject.AppConstants.USER_SETTINGS;
 
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LocationListener{
@@ -83,14 +78,14 @@ public class MainActivity extends AppCompatActivity implements
 
         homeScreen = (LinearLayout) findViewById(R.id.home_screen);
         loadingScreen = (RelativeLayout) findViewById(R.id.loading_screen);
-        Button button = (Button) findViewById(R.id.button);
-        Button otherButton = (Button) findViewById(R.id.no_destination_search_button);
+        Button directSearchButton = (Button) findViewById(R.id.button);
+        Button randomSearchButton = (Button) findViewById(R.id.no_destination_search_button);
         final EditText editText = (EditText) findViewById(R.id.destination);
         Log.d(TAG, "onCreate: " + CurrentDate.isValidDate("yyyy-mm-dd"));
 
 
 
-        otherButton.setOnClickListener(new View.OnClickListener() {
+        randomSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final Dialog randomSearchParameterDialog = new Dialog(MainActivity.this);
@@ -110,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements
                         String price = maxPrice.getText().toString();
                         final String origin = originAirport.getText().toString();
 
-                        if (!price.equals("")) {
+                        if (!price.equals("") && isValidBudget(price)) {
                             UserSettings.getInstance().setPrice(Integer.valueOf(maxPrice.getText().toString()));
                         }
 
@@ -163,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        directSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 text = editText.getText().toString();
@@ -211,11 +206,9 @@ public class MainActivity extends AppCompatActivity implements
         googleApiClient.connect();
     }
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        //setUserLocation();
         try {
             startLocationUpdates();
         } catch (SecurityException e) {
@@ -226,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        Log.d(TAG, "onConnectionSuspended: " + i);
     }
 
     @Override
@@ -272,55 +265,13 @@ public class MainActivity extends AppCompatActivity implements
                 googleApiClient, locationRequest, this);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-
-                try {
-                            /*
-                            String [] lat_lon = getLatLon(text);
-
-                            URL url = new URL("http://api.sandbox.amadeus.com/");
-                            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                            urlConnection.setReadTimeout(30000);
-                            urlConnection.setConnectTimeout(30000);
-
-                            Airport closestAirport = getClosestAirport(lat_lon[0], lat_lon[1]);
-                            Flight cheapestFlight = getCheapestFlight(closestAirport);
-                            Flight randomFlight = getRandomFlight();
-                            getCheapestHotel(lat_lon[0],lat_lon[1]);
-
-                            Log.d(TAG, "doInBackground: " +cheapestFlight.getArriveDestination());
-                            */
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-                try {
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
+    public boolean isValidBudget (String input) {
+        try {
+            int num = Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
 
