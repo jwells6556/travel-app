@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -27,6 +29,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.justinwells.mytravelproject.Airport;
 import com.justinwells.mytravelproject.CurrentDate;
+import com.justinwells.mytravelproject.Flight;
+import com.justinwells.mytravelproject.FlightResultsSingleton;
 import com.justinwells.mytravelproject.R;
 import com.justinwells.mytravelproject.TravelApiHelper;
 import com.justinwells.mytravelproject.UserSettings;
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements
     String text;
     Location userLocation;
     LocationRequest locationRequest;
+    RelativeLayout loadingScreen;
+    LinearLayout homeScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements
         locationRequest.setInterval(60000);
         locationRequest.setFastestInterval(60000);
 
+        homeScreen = (LinearLayout) findViewById(R.id.home_screen);
+        loadingScreen = (RelativeLayout) findViewById(R.id.loading_screen);
         Button button = (Button) findViewById(R.id.button);
         Button otherButton = (Button) findViewById(R.id.no_destination_search_button);
         final EditText editText = (EditText) findViewById(R.id.destination);
@@ -160,7 +168,39 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View view) {
                 text = editText.getText().toString();
 
+                AsyncTask<String,Void,Flight> search = new AsyncTask<String, Void, Flight>() {
 
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        homeScreen.setVisibility(View.GONE);
+                        loadingScreen.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    protected Flight doInBackground(String... strings) {
+                        try {
+                            String [] lat_lon =travelHelper.getLatLon(strings[0]);
+                            Airport closestAirport = travelHelper.getClosestAirport(lat_lon[0], lat_lon[1]);
+                            return travelHelper.getCheapestFlight(closestAirport);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Flight flight) {
+                        super.onPostExecute(flight);
+                        Intent goToDetail = new Intent(MainActivity.this,DetailActivity.class);
+                        goToDetail.putExtra("id", "DirectSearch");
+                        FlightResultsSingleton.getInstance().setDirectSearchFlight(flight);
+                        startActivity(goToDetail);
+                    }
+                }.execute(text);
             }
         });
     }

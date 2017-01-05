@@ -46,6 +46,7 @@ public class ResultRecyclerViewAdapter extends RecyclerView.Adapter<ResultViewHo
             public void onClick(View view) {
                 Intent goToDetail = new Intent(view.getContext(), DetailActivity.class);
                 goToDetail.putExtra("pos", position);
+                goToDetail.putExtra("id", "RandomSearch");
                 view.getContext().startActivity(goToDetail);
             }
         });

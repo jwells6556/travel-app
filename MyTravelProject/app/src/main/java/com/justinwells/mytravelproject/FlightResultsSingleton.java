@@ -9,6 +9,7 @@ import java.util.List;
 public class FlightResultsSingleton {
     private static FlightResultsSingleton sInstance;
     List<Flight>flightResultsList;
+    Flight directSearchFlight;
 
     private FlightResultsSingleton () {
        flightResultsList = new ArrayList<>();
@@ -39,5 +40,13 @@ public class FlightResultsSingleton {
 
     public List<Flight> getFlightResultsList () {
         return flightResultsList;
+    }
+
+    public Flight getDirectSearchFlight() {
+        return directSearchFlight;
+    }
+
+    public void setDirectSearchFlight(Flight directSearchFlight) {
+        this.directSearchFlight = directSearchFlight;
     }
 }

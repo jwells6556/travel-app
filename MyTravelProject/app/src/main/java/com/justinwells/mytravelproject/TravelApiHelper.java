@@ -51,7 +51,7 @@ public class TravelApiHelper {
         return new Airport(airportCode,airportCity,airportName);
     }
 
-    public String [] getLatLon (String location, String text) throws JSONException, IOException {
+    public String [] getLatLon (String text) throws JSONException, IOException {
         Request request = new Request.Builder()
                 .url("https://maps.googleapis.com/maps/api/geocode/json?key="
                         + GOOGLE_API_KEY
@@ -112,12 +112,10 @@ public class TravelApiHelper {
                 .getString("total_price");
 
         String departOrigin = outboundFlight.getString("departs_at").substring(0,10);
-        String arriveDestination = outboundFlight.getString("arrives_at").substring(0,10);
-        String departDestination = inboundFlight.getString("departs_at").substring(0,10);
         String arriveOrigin = inboundFlight.getString("arrives_at").substring(0,10);
 
 
-        return new Flight(price,departOrigin,arriveDestination,departDestination,arriveOrigin);
+        return new Flight(price,departOrigin,arriveOrigin, getDestinationNameFromAirportCode(destination.getCode()));
     }
 
     public void getCheapestHotel (String latitude, String longitude) throws IOException {
@@ -218,5 +216,34 @@ public class TravelApiHelper {
         return jsonArray.getJSONObject(0).getString("value");
     }
 
+    public Hotel getHotel (String code, String checkIn, String checkOut) throws IOException, JSONException {
+        String url = "https://api.sandbox.amadeus.com/v1.2/hotels/search-airport"
+                    +"?apikey=" + TRAVEL_API_KEY
+                    +"&location=" + code
+                    +"&check_in=" + checkIn
+                    +"&check_out=" + checkOut
+                    +"&number_of_results=1";
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
+        Response response = mClient.newCall(request).execute();
+
+        if(!response.isSuccessful()) {
+            return null;
+        }
+
+        String responseText = response.body().string();
+
+        JSONObject jsonObject = new JSONObject(responseText);
+
+        JSONObject result = jsonObject.getJSONArray("results")
+                                .getJSONObject(0);
+
+        String hotelName = result.getString("property_name");
+        String hotelPrice = result.getString("total_price");
+
+        return new Hotel(hotelName, hotelPrice);
+
+    }
 }

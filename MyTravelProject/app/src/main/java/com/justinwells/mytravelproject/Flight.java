@@ -6,16 +6,9 @@ import java.io.Serializable;
  * Created by justinwells on 12/22/16.
  */
 
-public class Flight implements Serializable{
+public class Flight {
     private String price, departOrigin, arriveDestination, departDestination, arriveOrigin, destination;
 
-    public Flight(String price, String departOrigin, String arriveDestination, String departDestination, String arriveOrigin) {
-        this.price = "$" + price;
-        this.departOrigin = departOrigin;
-        this.arriveDestination = arriveDestination;
-        this.departDestination = departDestination;
-        this.arriveOrigin = arriveOrigin;
-    }
 
     public Flight(String price, String departDate, String returnDate, String destination) {
         this.price = "$" + price;

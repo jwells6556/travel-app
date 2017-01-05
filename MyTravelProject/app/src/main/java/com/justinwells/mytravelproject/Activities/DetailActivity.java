@@ -7,7 +7,9 @@ import android.widget.TextView;
 
 import com.justinwells.mytravelproject.Flight;
 import com.justinwells.mytravelproject.FlightResultsSingleton;
+import com.justinwells.mytravelproject.Hotel;
 import com.justinwells.mytravelproject.R;
+import com.justinwells.mytravelproject.TravelApiHelper;
 import com.justinwells.mytravelproject.Weather;
 import com.justinwells.mytravelproject.WeatherApiHelper;
 
@@ -19,6 +21,10 @@ public class DetailActivity extends AppCompatActivity {
     TextView title, flightPrice, hotelName, hotelPrice, weatherView;
     String location;
     FlightResultsSingleton flightResultsSingleton;
+    Flight flight;
+    int totalPrice, airfare, hotelfare;
+    TravelApiHelper travelHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,12 +37,43 @@ public class DetailActivity extends AppCompatActivity {
         weatherView = (TextView) findViewById(R.id.weather);
 
         flightResultsSingleton = FlightResultsSingleton.getInstance();
+        travelHelper = new TravelApiHelper();
 
-        Flight flight = flightResultsSingleton.getFlight(getIntent().getIntExtra("pos",-1));
+        flight = getFlight();
         location = flight.getDestination();
         title.setText(location);
 
         setWeather();
+        setHotelInfo();
+        setFlightInfo();
+    }
+
+    public void setHotelInfo () {
+        AsyncTask<Flight,Void,Hotel> getHotel = new AsyncTask<Flight, Void, Hotel>() {
+            @Override
+            protected Hotel doInBackground(Flight... flights) {
+                try {
+                    String code = travelHelper.getAirportCodeByName(flights[0].getDestination());
+                    return travelHelper.getHotel(code,flights[0].getDepartOrigin(),flights[0].getArriveOrigin());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Hotel hotel) {
+                super.onPostExecute(hotel);
+                hotelName.setText(hotel.getHotelName());
+                hotelPrice.setText(hotel.getPrice());
+            }
+        }.execute(flight);
+    }
+
+    public void setFlightInfo () {
+        flightPrice.setText(flight.getPrice());
     }
 
     public void setWeather () {
@@ -62,5 +99,15 @@ public class DetailActivity extends AppCompatActivity {
                                     +weather.getTemperature());
             }
         }.execute();
+    }
+
+    public Flight getFlight () {
+        String originActivity = getIntent().getStringExtra("id");
+
+        if (originActivity.equals("RandomSearch")) {
+            return flightResultsSingleton.getFlight(getIntent().getIntExtra("pos",-1));
+        }
+
+        return flightResultsSingleton.getDirectSearchFlight();
     }
 }
