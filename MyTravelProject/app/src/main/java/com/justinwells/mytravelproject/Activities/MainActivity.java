@@ -1,6 +1,7 @@
 package com.justinwells.mytravelproject.Activities;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,23 +27,13 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.justinwells.mytravelproject.Airport;
 import com.justinwells.mytravelproject.CurrentDate;
-import com.justinwells.mytravelproject.Flight;
 import com.justinwells.mytravelproject.R;
 import com.justinwells.mytravelproject.TravelApiHelper;
-import com.justinwells.mytravelproject.UserAirport;
+import com.justinwells.mytravelproject.UserSettings;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Date;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import static com.justinwells.mytravelproject.AppConstants.PREFERRED_AIRPORT;
 import static com.justinwells.mytravelproject.AppConstants.USER_SETTINGS;
@@ -94,8 +85,73 @@ public class MainActivity extends AppCompatActivity implements
         otherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent getRandomResults = new Intent(MainActivity.this, ResultsActivity.class);
-                startActivity(getRandomResults);
+                final Dialog randomSearchParameterDialog = new Dialog(MainActivity.this);
+                randomSearchParameterDialog.setContentView(R.layout.random_flight_search_parameter_dialog);
+
+                final EditText maxPrice = (EditText) randomSearchParameterDialog.findViewById(R.id.random_search_budget);
+                final EditText originAirport = (EditText) randomSearchParameterDialog.findViewById(R.id.random_search_departure);
+                Button searchButton = (Button) randomSearchParameterDialog.findViewById(R.id.continue_random_search);
+                Button cancelButton = (Button) randomSearchParameterDialog.findViewById(R.id.cancel_random_search);
+
+                maxPrice.setHint("Enter Budget (Currently $" + UserSettings.getInstance().getPrice()+")");
+                originAirport.setHint("Enter Origin (Currently " + UserSettings.getInstance().getAirport() + ")");
+
+                searchButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String price = maxPrice.getText().toString();
+                        final String origin = originAirport.getText().toString();
+
+                        if (!price.equals("")) {
+                            UserSettings.getInstance().setPrice(Integer.valueOf(maxPrice.getText().toString()));
+                        }
+
+                        if (!origin.equals("")) {
+                            AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
+                                @Override
+                                protected String doInBackground(String... strings) {
+                                    try {
+                                        return travelHelper.getAirportCodeByName(strings[0]);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(String s) {
+                                    super.onPostExecute(s);
+                                    if (s!=null) {
+                                        Log.d(TAG, "onPostExecute: " + s);
+                                        UserSettings.getInstance().setAirport(s);
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Invalid Origin", Toast.LENGTH_SHORT).show();
+                                    }
+                                    randomSearchParameterDialog.dismiss();
+                                    Intent getRandomResults = new Intent(MainActivity.this, ResultsActivity.class);
+                                    startActivity(getRandomResults);
+                                }
+                            }.execute(origin);
+
+                        } else {
+
+                            randomSearchParameterDialog.dismiss();
+                            Intent getRandomResults = new Intent(MainActivity.this, ResultsActivity.class);
+                            startActivity(getRandomResults);
+                        }
+                    }
+                });
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        randomSearchParameterDialog.dismiss();
+                    }
+                });
+
+                randomSearchParameterDialog.show();
             }
         });
 
@@ -146,16 +202,28 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        userLocation = location;
-        try {
-            String closestAirportCode = travelHelper.getClosestAirport(String.valueOf(location.getLatitude())
-                                        ,String.valueOf(location.getLongitude())).getCode();
-            UserAirport.getInstance().setAirport(closestAirportCode);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+       AsyncTask<Location, Void, String> task = new AsyncTask<Location, Void, String>() {
+           @Override
+           protected String doInBackground(Location... locations) {
+               userLocation = locations[0];
+               try {
+                   return travelHelper.getClosestAirport(String.valueOf(userLocation.getLatitude())
+                           ,String.valueOf(userLocation.getLongitude())).getCode();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               } catch (JSONException e) {
+                   e.printStackTrace();
+               }
+
+               return null;
+           }
+
+           @Override
+           protected void onPostExecute(String s) {
+               super.onPostExecute(s);
+               UserSettings.getInstance().setAirport(s);
+           }
+       }.execute(location);
         Log.d(TAG, "onLocationChanged: updated");
     }
 
@@ -164,70 +232,18 @@ public class MainActivity extends AppCompatActivity implements
                 googleApiClient, locationRequest, this);
     }
 
-    public void setUserLocation() {
-        final SharedPreferences sharedPreferences = getSharedPreferences(USER_SETTINGS,
-                Context.MODE_PRIVATE);
-        String airport = sharedPreferences.getString(PREFERRED_AIRPORT, null);
-        Log.d(TAG, "setUserLocation: " + airport);
-        ;
-        if (airport != null) {
-            UserAirport.getInstance().setAirport(airport);
-            Toast.makeText(this, UserAirport.getInstance().getAirport(), Toast.LENGTH_SHORT).show();
-        } else {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            Location location = LocationServices.FusedLocationApi.getLastLocation(
-                    googleApiClient);
 
-            Log.d(TAG, "setUserLocation: " + location.getLatitude());
-            if (location != null) {
-                AsyncTask<Location,Void,Airport> setDefaultAirport = new AsyncTask<Location, Void, Airport>() {
-                    @Override
-                    protected Airport doInBackground(Location... locations) {
-                        String latitude = String.valueOf(locations[0].getLatitude());
-                        String longitude = String.valueOf(locations[0].getLongitude());
 
-                        try {
-                            return travelHelper.getClosestAirport(latitude,longitude);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
 
-                        return null;
-                    }
 
-                    @Override
-                    protected void onPostExecute(Airport airport) {
-                        super.onPostExecute(airport);
-                        String airportCode;
-                        if (airport == null) {
-                            Toast.makeText(MainActivity.this, "Closest airport location failed", Toast.LENGTH_SHORT).show();
-                            airportCode = "LAX";
-                        } else {
-                            airportCode = airport.getCode();
-                        }
 
-                        Log.d(TAG, "onPostExecute: " + airportCode);
-                        UserAirport.getInstance().setAirport(airportCode);
 
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(PREFERRED_AIRPORT, airportCode);
-                        editor.commit();
-                    }
-                }.execute(location);
-            }
-        }
+
+
+
+
+
 
         AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
             @Override
@@ -265,6 +281,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         };
-    }
+
 }
 

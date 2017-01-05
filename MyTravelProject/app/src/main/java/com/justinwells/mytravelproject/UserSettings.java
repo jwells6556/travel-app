@@ -6,17 +6,27 @@ package com.justinwells.mytravelproject;
  * Created by justinwells on 1/5/17.
  */
 
-public class UserAirport {
+public class UserSettings {
     String airport;
-    public static UserAirport sInstance;
+    int price;
 
-    private UserAirport () {
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public static UserSettings sInstance;
+
+    private UserSettings() {
 
     }
 
-    public static UserAirport getInstance () {
+    public static UserSettings getInstance () {
        if (sInstance == null) {
-           sInstance = new UserAirport();
+           sInstance = new UserSettings();
        }
 
        return sInstance;

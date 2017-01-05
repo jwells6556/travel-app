@@ -1,18 +1,6 @@
 package com.justinwells.mytravelproject;
 
-import android.content.Context;
-import android.location.Location;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.justinwells.mytravelproject.Activities.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -94,7 +82,7 @@ public class TravelApiHelper {
     public Flight getCheapestFlight (Airport destination) throws IOException, JSONException {
         Request request = new Request.Builder()
                 .url("http://api.sandbox.amadeus.com/v1.2/flights/low-fare-search?"
-                        +"origin=" + UserAirport.getInstance().getAirport()
+                        +"origin=" + UserSettings.getInstance().getAirport()
                         +"&destination="+destination.getCode()
                         +"&departure_date=2017-10-15"
                         +"&return_date=2017-10-21"
@@ -156,11 +144,11 @@ public class TravelApiHelper {
         String baseUrl = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?";
         final Request request = new Request.Builder()
                 .url(baseUrl
-                        +"origin=" + UserAirport.getInstance().getAirport()
-                        +"&max_price=500"
+                        +"origin=" + UserSettings.getInstance().getAirport()
+                        +"&max_price=" + UserSettings.getInstance().getPrice()
                         +"&apikey=" + TRAVEL_API_KEY)
                 .build();
-        Log.d(TAG, "getRandomFlight: " + UserAirport.getInstance().getAirport());
+        Log.d(TAG, "getRandomFlight: " + UserSettings.getInstance().getAirport());
         Response response = mClient.newCall(request).execute();
         String responseText = response.body().string();
 
@@ -207,6 +195,27 @@ public class TravelApiHelper {
 
 
         return cityInfo.getString("name");
+    }
+
+    public String getAirportCodeByName (String query) throws IOException, JSONException {
+        String url = "http://api.sandbox.amadeus.com/v1.2/airports/autocomplete"
+                +"?apikey=" + TRAVEL_API_KEY
+                +"&term=" + query;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Response response = mClient.newCall(request).execute();
+
+        if (!response.isSuccessful()) {
+            return null;
+        }
+
+        String responseText = response.body().string();
+
+        JSONArray jsonArray = new JSONArray(responseText);
+
+        return jsonArray.getJSONObject(0).getString("value");
     }
 
 
