@@ -27,7 +27,9 @@ public class FlightResultsSingleton {
     }
 
     public void clearList () {
-        flightResultsList.clear();
+        if (flightResultsList!=null) {
+            flightResultsList.clear();
+        }
     }
 
     public void newList (List<Flight>list) {

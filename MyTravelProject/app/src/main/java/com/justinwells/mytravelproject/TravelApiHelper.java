@@ -1,9 +1,17 @@
 package com.justinwells.mytravelproject;
 
+import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.justinwells.mytravelproject.Activities.MainActivity;
 
 import org.json.JSONArray;
@@ -86,7 +94,7 @@ public class TravelApiHelper {
     public Flight getCheapestFlight (Airport destination) throws IOException, JSONException {
         Request request = new Request.Builder()
                 .url("http://api.sandbox.amadeus.com/v1.2/flights/low-fare-search?"
-                        +"origin=" +"JFK"
+                        +"origin=" + UserAirport.getInstance().getAirport()
                         +"&destination="+destination.getCode()
                         +"&departure_date=2017-10-15"
                         +"&return_date=2017-10-21"
@@ -148,11 +156,11 @@ public class TravelApiHelper {
         String baseUrl = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?";
         final Request request = new Request.Builder()
                 .url(baseUrl
-                        +"origin=" + "JFK"
+                        +"origin=" + UserAirport.getInstance().getAirport()
                         +"&max_price=500"
                         +"&apikey=" + TRAVEL_API_KEY)
                 .build();
-
+        Log.d(TAG, "getRandomFlight: " + UserAirport.getInstance().getAirport());
         Response response = mClient.newCall(request).execute();
         String responseText = response.body().string();
 
@@ -200,4 +208,6 @@ public class TravelApiHelper {
 
         return cityInfo.getString("name");
     }
+
+
 }
