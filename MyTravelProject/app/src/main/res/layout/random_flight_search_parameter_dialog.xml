@@ -6,7 +6,8 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/dialogBackground">
         <EditText
             android:id="@+id/random_search_budget"
             android:layout_width="match_parent"

@@ -240,12 +240,13 @@ public class TravelApiHelper {
                 .url(url)
                 .build();
         String responseText = mClient.newCall(request).execute().body().string();
-
+        Log.d(TAG, "getDestinationNameFromAirportCode: " + responseText);
         JSONObject jsonObject = new JSONObject(responseText);
-        JSONObject cityInfo = jsonObject.getJSONObject("city");
+        JSONArray airportInfo = jsonObject.getJSONArray("airports");
+        JSONObject cityInfo = airportInfo.getJSONObject(0);
 
 
-        return cityInfo.getString("name");
+        return cityInfo.getString("city_name");
     }
 
     public String getAirportCodeByName (String query) throws IOException, JSONException {
@@ -283,10 +284,12 @@ public class TravelApiHelper {
         Response response = mClient.newCall(request).execute();
 
         if(!response.isSuccessful()) {
+            Log.d(TAG, "getHotel: " + response.body().string());
             return null;
         }
 
         String responseText = response.body().string();
+        Log.d(TAG, "getHotel: " + responseText);
 
         JSONObject jsonObject = new JSONObject(responseText);
 

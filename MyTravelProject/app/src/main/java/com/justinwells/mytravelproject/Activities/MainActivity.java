@@ -193,6 +193,8 @@ public class MainActivity extends AppCompatActivity implements
                         Intent goToDetail = new Intent(MainActivity.this,DetailActivity.class);
                         goToDetail.putExtra("id", "DirectSearch");
                         FlightResultsSingleton.getInstance().setDirectSearchFlight(flight);
+                        homeScreen.setVisibility(View.VISIBLE);
+                        loadingScreen.setVisibility(View.GONE);
                         startActivity(goToDetail);
                     }
                 }.execute(text);
@@ -272,6 +274,34 @@ public class MainActivity extends AppCompatActivity implements
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public void completeSearch (final Airport airport) {
+        AsyncTask<Airport, Void, Flight> flightTask = new AsyncTask<Airport, Void, Flight>() {
+            @Override
+            protected Flight doInBackground(Airport... airports) {
+                try {
+                    return travelHelper.getCheapestFlight(airport);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Flight flight) {
+                super.onPostExecute(flight);
+                Intent goToDetail = new Intent(MainActivity.this,DetailActivity.class);
+                goToDetail.putExtra("id", "DirectSearch");
+                FlightResultsSingleton.getInstance().setDirectSearchFlight(flight);
+                homeScreen.setVisibility(View.VISIBLE);
+                loadingScreen.setVisibility(View.GONE);
+                startActivity(goToDetail);
+            }
+        };
     }
 }
 

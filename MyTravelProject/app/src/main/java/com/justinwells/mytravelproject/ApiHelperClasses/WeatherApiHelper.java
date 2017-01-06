@@ -42,7 +42,7 @@ public class WeatherApiHelper {
                                 .getJSONObject(0)
                                 .getString("main");
 
-        int temperature = (int) jsonObject.getJSONObject("main")
+        int temperature = jsonObject.getJSONObject("main")
                                         .getInt("temp");
 
 
