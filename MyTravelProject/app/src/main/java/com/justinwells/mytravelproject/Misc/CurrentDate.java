@@ -1,4 +1,4 @@
-package com.justinwells.mytravelproject;
+package com.justinwells.mytravelproject.Misc;
 
 import android.util.Log;
 import java.util.Calendar;

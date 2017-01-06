@@ -2,6 +2,11 @@ package com.justinwells.mytravelproject.ApiHelperClasses;
 
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.justinwells.mytravelproject.CustomObjects.Airport;
 import com.justinwells.mytravelproject.CustomObjects.Flight;
 import com.justinwells.mytravelproject.CustomObjects.Hotel;
@@ -18,18 +23,60 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.justinwells.mytravelproject.Misc.AppConstants.LOCATION_CODE;
+import static com.justinwells.mytravelproject.Misc.AppConstants.TRAVEL_CODE;
+
 /**
  * Created by justinwells on 1/4/17.
  */
 
 public class TravelApiHelper {
-    public static final String TRAVEL_API_KEY = "KMi5Y1K7oFM62kCGOzteHSV8AWL989Id";
-    public static final String GOOGLE_API_KEY = "AIzaSyCQEjFv_ANAwNvxFvTCy97VK8PCkhM0hmw";
+    private String TRAVEL_API_KEY;
+    private String GOOGLE_API_KEY;
     public static final String TAG = "mytravelproject";
     private OkHttpClient mClient;
+    static TravelApiHelper sInstance;
 
-    public TravelApiHelper() {
+    private TravelApiHelper() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference travelRef = database.getReference(TRAVEL_CODE);
+        DatabaseReference locationRef = database.getReference(LOCATION_CODE);
+       // database.
+        travelRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                TRAVEL_API_KEY = dataSnapshot.getValue(String.class);
+                Log.d(TAG, "onDataChange: " + TRAVEL_API_KEY);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        locationRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GOOGLE_API_KEY = dataSnapshot.getValue(String.class);
+                Log.d(TAG, "onDataChange: " + GOOGLE_API_KEY);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         mClient = new OkHttpClient();
+    }
+
+    public static TravelApiHelper getInstance () {
+        if (sInstance == null) {
+            sInstance = new TravelApiHelper();
+        }
+
+        return sInstance;
     }
 
     public Airport getClosestAirport (String latitude, String longitude) throws IOException, JSONException {
@@ -151,6 +198,7 @@ public class TravelApiHelper {
                         +"&max_price=" + UserSettings.getInstance().getPrice()
                         +"&apikey=" + TRAVEL_API_KEY)
                 .build();
+        Log.d(TAG, "getRandomFlight: " + TRAVEL_API_KEY);
         Log.d(TAG, "getRandomFlight: " + UserSettings.getInstance().getAirport());
         Response response = mClient.newCall(request).execute();
         String responseText = response.body().string();
@@ -215,7 +263,7 @@ public class TravelApiHelper {
         }
 
         String responseText = response.body().string();
-
+        Log.d(TAG, "getAirportCodeByName: " + responseText);
         JSONArray jsonArray = new JSONArray(responseText);
 
         return jsonArray.getJSONObject(0).getString("value");

@@ -37,9 +37,14 @@ public class DetailActivity extends AppCompatActivity {
         weatherView = (TextView) findViewById(R.id.weather);
 
         flightResultsSingleton = FlightResultsSingleton.getInstance();
-        travelHelper = new TravelApiHelper();
+        travelHelper = TravelApiHelper.getInstance();
 
         flight = getFlight();
+
+        if (flight==null) {
+            finish();
+        }
+
         location = flight.getDestination();
         title.setText(location);
 
@@ -69,14 +74,14 @@ public class DetailActivity extends AppCompatActivity {
                 super.onPostExecute(hotel);
                 hotelName.setText(hotel.getHotelName());
                 hotelPrice.setText(hotel.getPrice());
-                hotelFare = Integer.valueOf(hotel.getPrice());
+                hotelFare = Math.round(Float.valueOf(hotel.getPrice()));
             }
         }.execute(flight);
     }
 
     public void setFlightInfo () {
         flightPrice.setText(flight.getPrice());
-        airFare = Integer.valueOf(flight.getPrice());
+        airFare = Math.round(Float.valueOf(flight.getPrice().substring(1)));
     }
 
     public void setWeather () {

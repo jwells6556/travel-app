@@ -26,7 +26,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.justinwells.mytravelproject.CustomObjects.Airport;
-import com.justinwells.mytravelproject.CurrentDate;
+import com.justinwells.mytravelproject.Misc.CurrentDate;
 import com.justinwells.mytravelproject.CustomObjects.Flight;
 import com.justinwells.mytravelproject.Singletons.FlightResultsSingleton;
 import com.justinwells.mytravelproject.R;
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
                     138);
         }
 
-        travelHelper = new TravelApiHelper();
+        travelHelper = TravelApiHelper.getInstance();
 
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(this)

@@ -52,7 +52,7 @@ public class ResultsActivity extends AppCompatActivity {
 
             @Override
             protected List<Flight> doInBackground(Void... voids) {
-                TravelApiHelper helper = new TravelApiHelper();
+                TravelApiHelper helper = TravelApiHelper.getInstance();
                 List <Flight> list;
                 try {
                     return helper.getRandomFlight();
