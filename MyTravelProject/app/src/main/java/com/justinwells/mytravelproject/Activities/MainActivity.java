@@ -40,10 +40,9 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LocationListener{
 
-    public static final String TAG = "i'm a tag!";
+    public static final String TAG = "MainActivity";
     TravelApiHelper travelHelper;
     GoogleApiClient googleApiClient;
-    String text;
     Location userLocation;
     LocationRequest locationRequest;
     RelativeLayout loadingScreen;
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements
         loadingScreen = (RelativeLayout) findViewById(R.id.loading_screen);
         Button directSearchButton = (Button) findViewById(R.id.button);
         Button randomSearchButton = (Button) findViewById(R.id.no_destination_search_button);
-        final EditText editText = (EditText) findViewById(R.id.destination);
         Log.d(TAG, "onCreate: " + CurrentDate.isValidDate("yyyy-mm-dd"));
 
 
@@ -161,45 +159,73 @@ public class MainActivity extends AppCompatActivity implements
         directSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                text = editText.getText().toString();
 
-                AsyncTask<String,Void,Flight> search = new AsyncTask<String, Void, Flight>() {
+                final Dialog directSearchParameterDialog = new Dialog(MainActivity.this);
+                directSearchParameterDialog.setContentView(R.layout.direct_flight_search_dialog);
 
+                final EditText destination = (EditText) directSearchParameterDialog.findViewById(R.id.direct_search_location);
+                Button searchButton = (Button) directSearchParameterDialog.findViewById(R.id.continue_direct_search);
+                Button cancelButton = (Button) directSearchParameterDialog.findViewById(R.id.cancel_direct_search);
+
+                destination.setHint("Enter Destination");
+
+
+                searchButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        homeScreen.setVisibility(View.GONE);
-                        loadingScreen.setVisibility(View.VISIBLE);
-                    }
+                    public void onClick(View view) {
+                        String destinationText = destination.getText().toString();
+                        AsyncTask<String,Void,Flight> search = new AsyncTask<String, Void, Flight>() {
+                            @Override
+                            protected void onPreExecute() {
 
+                                super.onPreExecute();
+                                homeScreen.setVisibility(View.GONE);
+                                loadingScreen.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            protected Flight doInBackground(String... strings) {
+                                try {
+                                    String [] lat_lon =travelHelper.getLatLon(strings[0]);
+                                    Airport closestAirport = travelHelper.getClosestAirport(lat_lon[0], lat_lon[1]);
+                                    return travelHelper.getCheapestFlight(closestAirport);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Flight flight) {
+                                super.onPostExecute(flight);
+                                Intent goToDetail = new Intent(MainActivity.this,DetailActivity.class);
+                                goToDetail.putExtra("id", "DirectSearch");
+                                FlightResultsSingleton.getInstance().setDirectSearchFlight(flight);
+                                homeScreen.setVisibility(View.VISIBLE);
+                                loadingScreen.setVisibility(View.GONE);
+                                directSearchParameterDialog.dismiss();
+                                startActivity(goToDetail);
+                            }
+                        }.execute(destinationText);
+                    }
+                });
+
+
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    protected Flight doInBackground(String... strings) {
-                        try {
-                            String [] lat_lon =travelHelper.getLatLon(strings[0]);
-                            Airport closestAirport = travelHelper.getClosestAirport(lat_lon[0], lat_lon[1]);
-                            return travelHelper.getCheapestFlight(closestAirport);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        return null;
+                    public void onClick(View view) {
+                        directSearchParameterDialog.dismiss();
                     }
+                });
 
-                    @Override
-                    protected void onPostExecute(Flight flight) {
-                        super.onPostExecute(flight);
-                        Intent goToDetail = new Intent(MainActivity.this,DetailActivity.class);
-                        goToDetail.putExtra("id", "DirectSearch");
-                        FlightResultsSingleton.getInstance().setDirectSearchFlight(flight);
-                        homeScreen.setVisibility(View.VISIBLE);
-                        loadingScreen.setVisibility(View.GONE);
-                        startActivity(goToDetail);
-                    }
-                }.execute(text);
+                directSearchParameterDialog.show();
             }
         });
+
     }
 
     @Override
@@ -276,32 +302,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void completeSearch (final Airport airport) {
-        AsyncTask<Airport, Void, Flight> flightTask = new AsyncTask<Airport, Void, Flight>() {
-            @Override
-            protected Flight doInBackground(Airport... airports) {
-                try {
-                    return travelHelper.getCheapestFlight(airport);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Flight flight) {
-                super.onPostExecute(flight);
-                Intent goToDetail = new Intent(MainActivity.this,DetailActivity.class);
-                goToDetail.putExtra("id", "DirectSearch");
-                FlightResultsSingleton.getInstance().setDirectSearchFlight(flight);
-                homeScreen.setVisibility(View.VISIBLE);
-                loadingScreen.setVisibility(View.GONE);
-                startActivity(goToDetail);
-            }
-        };
-    }
 }
 

@@ -8,12 +8,9 @@
         android:layout_height="wrap_content"
         android:background="@color/dialogBackground"
         android:padding="8dp">
+
         <EditText
-            android:id="@+id/random_search_budget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/random_search_departure"
+            android:id="@+id/direct_search_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
@@ -22,7 +19,7 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/continue_random_search"
+                android:id="@+id/continue_direct_search"
                 android:text="search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -32,7 +29,7 @@
                 android:layout_weight="1"
                 android:layout_height="10dp"/>
             <Button
-                android:id="@+id/cancel_random_search"
+                android:id="@+id/cancel_direct_search"
                 android:text="cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

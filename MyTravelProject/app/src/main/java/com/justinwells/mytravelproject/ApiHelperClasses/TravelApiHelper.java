@@ -111,6 +111,7 @@ public class TravelApiHelper {
                         + text + "'")
                 .build();
         String getCoordinatesResponse = " ";
+        Log.d(TAG, "getLatLon: " + GOOGLE_API_KEY);
 
         Response response = mClient.newCall(request).execute();
 
