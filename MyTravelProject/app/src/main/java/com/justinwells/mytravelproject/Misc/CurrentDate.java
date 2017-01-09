@@ -2,6 +2,7 @@ package com.justinwells.mytravelproject.Misc;
 
 import android.util.Log;
 import java.util.Calendar;
+import java.util.Date;
 
 import static com.google.android.gms.plus.PlusOneDummyView.TAG;
 
@@ -16,7 +17,7 @@ public class CurrentDate {
         String todaysDate = getCurrentDate();
 
         int currentYear = Integer.parseInt(todaysDate.substring(0,4));
-        int currentMonth = Integer.parseInt(todaysDate.substring(5,7)) + 1;
+        int currentMonth = Integer.parseInt(todaysDate.substring(5,7));
         int currentDay = Integer.parseInt(todaysDate.substring(8));
 
         int enteredYear = Integer.parseInt(date.substring(0,4));
@@ -39,6 +40,45 @@ public class CurrentDate {
         }
 
         return true;
+    }
+
+    public static String idealFlightDate () {
+        Calendar cal = Calendar.getInstance();
+        int month = cal.get(Calendar.MONTH) + 3;
+        if (month > 12) {
+            month-=12;
+        }
+
+        String date = cal.get(Calendar.YEAR)+"-"+month+"-"+cal.get(Calendar.DATE);
+        Log.d(TAG, "idealFlightDate: " + date);
+
+        return date;
+    }
+
+    public static String returnDate () {
+        String date = idealFlightDate();
+        String [] seperated = date.split("-");
+        int day = Integer.parseInt(seperated[2]);
+        int month = Integer.parseInt(seperated[1]);
+        int year = Integer.parseInt(seperated[0]);
+
+        day += 7;
+
+        if (day > getDaysInMonth(month)) {
+            day -= getDaysInMonth(month);
+            month++;
+            if (month > 12) {
+                month = 1;
+                year++;
+            }
+        }
+
+        String nextWeek = year + "-" + month + "-" + day;
+        Log.d(TAG, "returnDate: " + nextWeek);
+
+        return nextWeek;
+
+
     }
 
     public static boolean isValidDate (String date) {
@@ -127,7 +167,7 @@ public class CurrentDate {
 
     public static String getCurrentDate () {
         Calendar cal = Calendar.getInstance();
-        return cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DATE);
+        return cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+cal.get(Calendar.DATE);
     }
 
     public static int lengthOfTrip (String departureDate, String returnDate) {
@@ -150,5 +190,7 @@ public class CurrentDate {
 
         return 31;
     }
+
+
 
 }

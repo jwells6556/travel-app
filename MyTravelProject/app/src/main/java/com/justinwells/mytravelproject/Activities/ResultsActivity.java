@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import com.justinwells.mytravelproject.Singletons.UserSettings;
 import java.util.List;
 
 public class ResultsActivity extends AppCompatActivity {
+    private static final String TAG = "ResultsActivity";
     private RecyclerView mRecyclerView;
     private ResultRecyclerViewAdapter mAdapter;
     LinearLayout loadingScreen;
@@ -31,10 +34,21 @@ public class ResultsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setUpViews();
+        FlightResultsSingleton.getInstance().reset();
         flightResultsSingleton = FlightResultsSingleton.getInstance();
         populateList();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (flightResultsSingleton.isCallComplete()) {
+            mAdapter.replaceList(flightResultsSingleton.getFlightResultsList());
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     private void populateList () {
@@ -52,6 +66,7 @@ public class ResultsActivity extends AppCompatActivity {
 
             @Override
             protected List<Flight> doInBackground(Void... voids) {
+                Log.d(TAG, "doInBackground: call made again" );
                 TravelApiHelper helper = TravelApiHelper.getInstance();
                 List <Flight> list;
                 try {
@@ -70,14 +85,18 @@ public class ResultsActivity extends AppCompatActivity {
                 mFlightList = flights;
 
                 flightResultsSingleton.newList(mFlightList);
-
+                flightResultsSingleton.setCallComplete(true);
                 if (!(mFlightList==null)) {
                     setUpRecyclerView(mFlightList);
                 } else {
                     Toast.makeText(getApplicationContext(), "No results found, try expanding search criteria", Toast.LENGTH_SHORT).show();
                 }
             }
-        }.execute();
+        };
+
+        if (!flightResultsSingleton.isCallComplete()) {
+            fillList.execute();
+        }
     }
 
     private void setUpRecyclerView (List<Flight> list) {
@@ -93,5 +112,17 @@ public class ResultsActivity extends AppCompatActivity {
         loadingText = (TextView) findViewById(R.id.search_criteria);
         mRecyclerView = (RecyclerView) findViewById(R.id.flight_search_results);
         loadingScreen = (LinearLayout) findViewById(R.id.random_results_loading);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(menuItem);
+        }
     }
 }

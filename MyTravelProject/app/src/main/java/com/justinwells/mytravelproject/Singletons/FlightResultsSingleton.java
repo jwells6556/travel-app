@@ -12,9 +12,20 @@ public class FlightResultsSingleton {
     private static FlightResultsSingleton sInstance;
     List<Flight>flightResultsList;
     Flight directSearchFlight;
+    boolean callComplete;
+
+    public boolean isCallComplete() {
+        return callComplete;
+    }
+
+    public void setCallComplete(boolean callComplete) {
+        this.callComplete = callComplete;
+    }
 
     private FlightResultsSingleton () {
-       flightResultsList = new ArrayList<>();
+
+        flightResultsList = new ArrayList<>();
+        callComplete = false;
     }
 
     public static FlightResultsSingleton getInstance () {
@@ -50,5 +61,9 @@ public class FlightResultsSingleton {
 
     public void setDirectSearchFlight(Flight directSearchFlight) {
         this.directSearchFlight = directSearchFlight;
+    }
+
+    public void reset () {
+        sInstance = null;
     }
 }

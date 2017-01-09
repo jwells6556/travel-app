@@ -10,6 +10,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.justinwells.mytravelproject.CustomObjects.Airport;
 import com.justinwells.mytravelproject.CustomObjects.Flight;
 import com.justinwells.mytravelproject.CustomObjects.Hotel;
+import com.justinwells.mytravelproject.Misc.CurrentDate;
 import com.justinwells.mytravelproject.Singletons.UserSettings;
 
 import org.json.JSONArray;
@@ -33,7 +34,7 @@ import static com.justinwells.mytravelproject.Misc.AppConstants.TRAVEL_CODE;
 public class TravelApiHelper {
     private String TRAVEL_API_KEY;
     private String GOOGLE_API_KEY;
-    public static final String TAG = "mytravelproject";
+    public static final String TAG = "TravelApiHelper";
     private OkHttpClient mClient;
     static TravelApiHelper sInstance;
 
@@ -41,7 +42,7 @@ public class TravelApiHelper {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference travelRef = database.getReference(TRAVEL_CODE);
         DatabaseReference locationRef = database.getReference(LOCATION_CODE);
-       // database.
+
         travelRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -51,7 +52,7 @@ public class TravelApiHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d(TAG, "onCancelled: ");
             }
         });
 
@@ -64,7 +65,7 @@ public class TravelApiHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d(TAG, "onCancelled: ");
             }
         });
 
@@ -137,8 +138,8 @@ public class TravelApiHelper {
                 .url("http://api.sandbox.amadeus.com/v1.2/flights/low-fare-search?"
                         +"origin=" + UserSettings.getInstance().getAirport()
                         +"&destination="+destination.getCode()
-                        +"&departure_date=2017-10-15"
-                        +"&return_date=2017-10-21"
+                        +"&departure_date=" + CurrentDate.idealFlightDate()
+                        +"&return_date=" + CurrentDate.returnDate()
                         +"&number_of_results=1"
                         +"&apikey="+TRAVEL_API_KEY)
                 .build();
@@ -215,8 +216,8 @@ public class TravelApiHelper {
             List<Flight>flightList = new ArrayList<>();
             int length = resultsArray.length();
 
-            if (length > 10) {
-                length = 10;
+            if (length > 20) {
+                length = 20;
             }
 
             for (int i = 0; i < length; i++) {

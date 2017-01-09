@@ -9,7 +9,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/cardBackground">
+        android:background="@drawable/clickable_card_background">
         <TextView
             android:id="@+id/destination"
             android:layout_gravity="center_horizontal"

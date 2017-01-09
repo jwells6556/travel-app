@@ -7,4 +7,5 @@
     <color name="cardBackground">#f3d2b3</color>
     <color name="dialogBackground">#cfc1af</color>
     <color name="TEMP">#f3d2b3</color>
+    <color name="cardPressed">#bf7945</color>
 </resources>

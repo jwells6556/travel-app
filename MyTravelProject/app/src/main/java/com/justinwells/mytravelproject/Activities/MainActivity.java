@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -77,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements
 
         homeScreen = (LinearLayout) findViewById(R.id.home_screen);
         loadingScreen = (RelativeLayout) findViewById(R.id.loading_screen);
-        Button directSearchButton = (Button) findViewById(R.id.button);
-        Button randomSearchButton = (Button) findViewById(R.id.no_destination_search_button);
+        CardView directSearchButton = (CardView) findViewById(R.id.button);
+        CardView randomSearchButton = (CardView) findViewById(R.id.no_destination_search_button);
         Log.d(TAG, "onCreate: " + CurrentDate.isValidDate("yyyy-mm-dd"));
 
 
@@ -105,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements
 
                         if (!price.equals("") && isValidBudget(price)) {
                             UserSettings.getInstance().setPrice(Integer.valueOf(maxPrice.getText().toString()));
+                        } else {
+                            Toast.makeText(MainActivity.this, "Invalid Budget", Toast.LENGTH_SHORT).show();
                         }
 
                         if (!origin.equals("")) {
@@ -300,6 +303,10 @@ public class MainActivity extends AppCompatActivity implements
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public boolean isNetworkConnection () {
+        return false;
     }
 
 

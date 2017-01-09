@@ -59,4 +59,8 @@ public class ResultRecyclerViewAdapter extends RecyclerView.Adapter<ResultViewHo
 
         return flightList.size();
     }
+
+    public void replaceList (List <Flight> list) {
+        flightList = list;
+    }
 }
