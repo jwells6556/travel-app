@@ -48,8 +48,25 @@ public class CurrentDate {
         if (month > 12) {
             month-=12;
         }
+        String monthString;
+        if (month <10) {
+            monthString = String.valueOf(month);
+            monthString = "0" + monthString;
 
-        String date = cal.get(Calendar.YEAR)+"-"+month+"-"+cal.get(Calendar.DATE);
+        } else {
+            monthString = String.valueOf(month);
+        }
+
+        String dayString;
+        if (cal.get(Calendar.DATE) <10) {
+            dayString = String.valueOf(cal.get(Calendar.DATE));
+            dayString = "0" + dayString;
+
+        } else {
+            dayString = String.valueOf(cal.get(Calendar.DATE));
+        }
+
+        String date = cal.get(Calendar.YEAR)+"-"+monthString+"-"+dayString;
         Log.d(TAG, "idealFlightDate: " + date);
 
         return date;
@@ -62,7 +79,7 @@ public class CurrentDate {
         int month = Integer.parseInt(seperated[1]);
         int year = Integer.parseInt(seperated[0]);
 
-        day += 7;
+        day += 2;
 
         if (day > getDaysInMonth(month)) {
             day -= getDaysInMonth(month);
@@ -73,7 +90,25 @@ public class CurrentDate {
             }
         }
 
-        String nextWeek = year + "-" + month + "-" + day;
+        String monthString;
+        if (month <10) {
+            monthString = String.valueOf(month);
+            monthString = "0" + monthString;
+
+        } else {
+            monthString = String.valueOf(month);
+        }
+
+        String dayString;
+        if (day <10) {
+            dayString = String.valueOf(day);
+            dayString = "0" + dayString;
+
+        } else {
+            dayString = String.valueOf(day);
+        }
+
+        String nextWeek = year + "-" + monthString + "-" + dayString;
         Log.d(TAG, "returnDate: " + nextWeek);
 
         return nextWeek;
