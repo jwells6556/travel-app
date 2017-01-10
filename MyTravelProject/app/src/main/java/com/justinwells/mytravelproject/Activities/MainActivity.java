@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -154,8 +156,9 @@ public class MainActivity extends AppCompatActivity implements
                         randomSearchParameterDialog.dismiss();
                     }
                 });
-
-                randomSearchParameterDialog.show();
+                if (isNetworkConnection()) {
+                    randomSearchParameterDialog.show();
+                }
             }
         });
 
@@ -224,8 +227,9 @@ public class MainActivity extends AppCompatActivity implements
                         directSearchParameterDialog.dismiss();
                     }
                 });
-
-                directSearchParameterDialog.show();
+                if (isNetworkConnection()) {
+                    directSearchParameterDialog.show();
+                }
             }
         });
 
@@ -306,6 +310,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public boolean isNetworkConnection () {
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+
+        if (info != null && info.isConnected()) {
+            return true;
+        }
+
+        Toast.makeText(this, "No network connection", Toast.LENGTH_SHORT).show();
         return false;
     }
 
